@@ -72,6 +72,7 @@ pub struct SqlxChildAttributes {
     pub default: bool,
     pub flatten: bool,
     pub try_from: Option<Ident>,
+    pub skip: bool,
 }
 
 pub fn parse_container_attributes(input: &[Attribute]) -> syn::Result<SqlxContainerAttributes> {
@@ -186,6 +187,7 @@ pub fn parse_child_attributes(input: &[Attribute]) -> syn::Result<SqlxChildAttri
     let mut default = false;
     let mut try_from = None;
     let mut flatten = false;
+    let mut skip = false;
 
     for attr in input.iter().filter(|a| a.path().is_ident("sqlx")) {
         if let Meta::List(list) = &attr.meta {
@@ -217,6 +219,7 @@ pub fn parse_child_attributes(input: &[Attribute]) -> syn::Result<SqlxChildAttri
                     }
                     Meta::Path(path) if path.is_ident("default") => default = true,
                     Meta::Path(path) if path.is_ident("flatten") => flatten = true,
+                    Meta::Path(path) if path.is_ident("skip") => skip = true,
                     u => fail!(u, "unexpected attribute inside sqlx(...)"),
                 }
             }
@@ -228,6 +231,7 @@ pub fn parse_child_attributes(input: &[Attribute]) -> syn::Result<SqlxChildAttri
         default,
         flatten,
         try_from,
+        skip,
     })
 }
 

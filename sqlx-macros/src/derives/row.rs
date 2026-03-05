@@ -74,6 +74,12 @@ fn expand_derive_from_row_struct(
             let attributes = parse_child_attributes(&field.attrs).unwrap();
             let ty = &field.ty;
 
+            if attributes.skip {
+                return Some(parse_quote!(
+                    let #id: #ty = Default::default();
+                ));
+            }
+
             let expr: Expr = match (attributes.flatten, attributes.try_from) {
                 (true, None) => {
                     predicates.push(parse_quote!(#ty: ::sqlx_oldapi::FromRow<#lifetime, R>));
